@@ -9,3 +9,4 @@
 1 False False True 100.0280
 0 False True False 49.4430
 0 False True False 44.1810
+0 False False True 100.0920

@@ -12,7 +12,7 @@ def wait_for_goal_to_finish():
 
 def publish_goal(path="z.json"):
     gX, gY, gTheta = goalSetter.calc_goal(path)
-    goalSetter.set_goal(gX, gY, gTheta, True)
+    goalSetter.set_goal(gX, gY, gTheta)
         
     
     goalSetter.spawn_marker(subprocess, gX, gY)

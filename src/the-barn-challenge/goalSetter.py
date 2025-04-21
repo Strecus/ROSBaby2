@@ -101,7 +101,7 @@ def set_goal(gX, gY, gTheta):
         #Estavlishes the server that this goal will be sent to
         client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
         # Lets the move_base node recieve the goal
-        client.cancel_all_goals()
+        
 
         
         client.wait_for_server()
