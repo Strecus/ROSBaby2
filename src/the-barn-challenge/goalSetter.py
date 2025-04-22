@@ -11,9 +11,10 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from geometry_msgs.msg import Quaternion
 import tf
 import json
+import subprocess
 
 
-def spawn_marker(subprocess, gX, gY):
+def spawn_marker(gX, gY):
     # Spawn new model at goal location
     
     try:
@@ -132,4 +133,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

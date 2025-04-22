@@ -15,7 +15,7 @@ def publish_goal(path="z.json"):
     goalSetter.set_goal(gX, gY, gTheta)
         
     
-    goalSetter.spawn_marker(subprocess, gX, gY)
+    goalSetter.spawn_marker(gX, gY)
 
 def main():
     rospy.init_node("goal_queuer", anonymous=True)

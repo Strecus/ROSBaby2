@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     gX, gY, gTheta = goalSetter.calc_goal("z.json", math.pi/2)
     goalSetter.set_goal(gX, gY, gTheta)
-    goalSetter.spawn_marker(subprocess, gX, gY)
+    goalSetter.spawn_marker(gX, gY)
         
     ##########################################################################################
     ## 2. Start navigation
