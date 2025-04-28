@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+import rospy
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Joy
+import time
+import json
+
+# Speed settings
+speed = 50  # Linear speed in meters per second
+turn = 50  # Angular speed in radians per second
+
+# Path storage
+path = []
+recording = False
+
+# Initialize ROS node and publisher
+rospy.init_node('teleop_joystick')
+pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+rate = rospy.Rate(10)  # 10 Hz
+
+def callback(data):
+    """Callback function to handle joystick input"""
+    global recording, path
+    twist = Twist()
+    
+    # Buttons for controlling the recording
+    start_button = 0  # PS4 'X' button (button 0)
+    stop_button = 1   # PS4 'O' button (button 1)
+    load_button = 3   # PS4 'Square' button (button 3)
+    
+    # Joystick axes for movement
+    forward_backward = data.axes[1]  # Left stick vertical axis
+    left_right = data.axes[0]        # Left stick horizontal axis
+    
+    if recording:
+        # Record the joystick input
+        path.append((forward_backward * speed, left_right * turn, 0.1))
+    
+    # Start recording when 'X' button is pressed
+    if data.buttons[start_button] == 1 and not recording:
+        print("Recording started...")
+        path = []  # Clear previous path
+        recording = True
+    
+    # Stop recording when 'O' button is pressed
+    if data.buttons[stop_button] == 1 and recording:
+        print("Recording stopped and saved.")
+        recording = False
+        save_path()
+    
+    # Load and play back the recorded path when 'Square' button is pressed
+    if data.buttons[load_button] == 1:
+        print("Playing back recorded path...")
+        load_path()
+        execute_path()
+    
+    # Move the robot based on joystick input
+    twist.linear.x = forward_backward * speed
+    twist.angular.z = left_right * turn
+    pub.publish(twist)
+
+def save_path(filename="path.json"):
+    """Save the recorded path to a file"""
+    global path
+    with open(filename, 'w') as f:
+        json.dump(path, f)
+    print(f"Path saved to {filename} with {len(path)} commands.")
+	print(path)
+def load_path(filename="path.json"):
+    """Load a recorded path from a file"""
+    global path
+    try:
+        with open(filename, 'r') as f:
+            path = json.load(f)
+        print(f"Path loaded from {filename} with {len(path)} commands.")
+    except Exception as e:
+        print(f"Error loading path: {e}")
+        path = []
+
+def execute_path(speed_factor=1.0):
+    """
+    Replay the recorded path
+    
+    Args:
+        speed_factor (float): Multiplier for execution speed.
+                             1.0 = original speed, 2.0 = twice as fast
+    """
+    global path
+    twist = Twist()
+    
+    if not path:
+        print("No path to execute. Record a path first.")
+        return
+        
+    print(f"Executing path with {len(path)} commands...")
+    
+    # Use the ROS rate that matches the frequency commands were captured
+    execution_rate = rospy.Rate(10 * speed_factor)  # 10Hz (same as node rate) * speed factor
+    
+    try:
+        for i, cmd in enumerate(path):
+            linear, angular, duration = cmd
+            
+            # Set movement commands
+            twist.linear.x = linear
+            twist.angular.z = angular
+            
+            # Publish the command
+            pub.publish(twist)
+            
+            # Use ROS rate for timing
+            execution_rate.sleep()
+            
+            # Log progress occasionally
+            if i % 20 == 0 or i == len(path) - 1:
+                print(f"Executing command {i+1}/{len(path)}...")
+                
+        # Ensure the robot stops at the end
+        twist.linear.x = 0
+        twist.angular.z = 0
+        pub.publish(twist)
+        print("Path execution complete.")
+        
+    except Exception as e:
+        # Safety stop if anything goes wrong
+        twist.linear.x = 0
+        twist.angular.z = 0
+        pub.publish(twist)
+        print(f"Error during path execution: {e}")
+
+def visualize_path():
+    """Print a simple visualization of the recorded path"""
+    global path
+    if not path:
+        print("No path to visualize.")
+        return
+        
+    print("\nRecorded Path Visualization:")
+    print("---------------------------")
+    for i, cmd in enumerate(path[:20]):  # Show first 20 commands
+        linear, angular, duration = cmd
+        direction = "↑" if linear > 0 else "↓" if linear < 0 else "·"
+        if angular > 0:
+            direction = "↰"  # Left turn
+        elif angular < 0:
+            direction = "↱"  # Right turn
+        
+        magnitude = abs(linear) / speed  # Normalize by max speed
+        visual = direction * max(1, int(magnitude * 10))
+        print(f"Step {i:3d}: {visual} (L: {linear:.1f}, A: {angular:.1f})")
+    
+    if len(path) > 20:
+        print(f"... and {len(path) - 20} more commands")
+    print("---------------------------")
+
+def main():
+    global path
+    print("Control Your Robot using Controller!")
+    print("Recording your path based on joystick input.")
+    print("Press 'X' button to begin recording.")
+    print("Press 'O' button to stop recording and save.")
+    print("Press 'Square' button to load and play the last recording.")
+    
+    # Subscribe to the joystick topic
+    rospy.Subscriber("/joy", Joy, callback)
+    
+    while not rospy.is_shutdown():
+        pass  # Keep the node alive, joystick callback handles everything
+
+if __name__ == '__main__':
+    main()

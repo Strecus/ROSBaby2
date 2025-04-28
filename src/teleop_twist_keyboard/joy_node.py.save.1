@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+
+import rospy
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Joy
+import time
+import json
+
+# Speed settings
+speed = 0.5  # Linear speed in meters per second
+turn = 1.0  # Angular speed in radians per second
+
+# Path storage
+path = []
+recording = False
+
+# Initialize ROS node and publisher
+rospy.init_node('teleop_joystick')
+pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)  # Publishing to cmd_vel
+
+rate = rospy.Rate(10)  # 10 Hz
+
+def callback(data):
+    """Callback function to handle joystick input"""
+    global recording
+    twist = Twist()
+
+    # Buttons for controlling the recording
+    start_button = 0  # PS4 'X' button (button 0)
+    stop_button = 1   # PS4 'O' button (button 1)
+    load_button = 3   # PS4 'Square' button (button 3)
+
+    # Joystick axes for movement
+    forward_backward = data.axes[1]  # Left stick vertical axis
+    left_right = data.axes[0]        # Left stick horizontal axis
+
+    if recording:
+        # Record the joystick input only once per axis movement
+        path.append((forward_backward * speed, left_right * turn, 0.1))  # Using 0.1 as the default duration per movement
+
+    # Start recording when 'X' button is pressed
+    if data.buttons[start_button] == 1 and not recording:
+        print("Recording started...")
+        recording = True
+
+    # Stop recording when 'O' button is pressed
+    if data.buttons[stop_button] == 1 and recording:
+        print("Recording stopped and saved.")
+        recording = False
+        save_path()
+
+    # Load and play back the recorded path when 'Square' button is pressed
+    if data.buttons[load_button] == 1:
+        print("Playing back recorded path...")
+        execute_path()
+
+    # Move the robot based on joystick input
+    twist.linear.x = forward_backward * speed
+    twist.angular.z = left_right * turn
+    pub.publish(twist)
+
+def save_path(filename="path.json"):
+    """Save the recorded path to a file"""
+    global path
+    with open(filename, 'w') as f:
+        json.dump(path, f)
+    print(f"Path saved to {filename}")
+
+def load_path(filename="path.json"):
+    """Load a recorded path from a file"""
+    global path
+    with open(filename, 'r') as f:
+        path = json.load(f)
+    print(f"Path loaded from {filename}")
+
+def execute_path():
+    """Replay a simple 'go straight' movement"""
+    twist = Twist()
+    print("Executing the recorded path...")
+
+    # Simple "go straight" command
+    linear_speed = 0.5  # Speed in meters per second
+    angular_speed = 0.0  # No rotation
+    duration = 5  # Duration for how long to move straight (in seconds)
+
+    # Set linear and angular velocities for "go straight"
+    twist.linear.x = linear_speed
+    twist.angular.z = angular_speed
+
+    # Move the robot for the specified duration
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        pub.publish(twist)
+        rate.sleep()
+
+    # Stop the robot after moving straight
+    twist.linear.x = 0
+    twist.angular.z = 0
+    pub.publish(twist)
+
+    print("Path execution complete.")
+
+def main():
+    global path
+    print("Control Your Robot using Controller!")
+    print("Recording your path based on joystick input.")
+    print("Press 'X' button to begin recording.")
+    print("Press 'O' button to stop recording and save.")
+    print("Press 'Square' button to load and play the last recording.")
+
+    # Subscribe to the joystick topic
+    rospy.Subscriber("/joy", Joy, callback)
+
+    while not rospy.is_shutdown():
+        pass  # Keep the node alive, joystick callback handles everything
+
+if __name__ == '__main__':
+    main()

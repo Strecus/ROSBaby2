@@ -34,7 +34,7 @@ def spawn_marker(gX, gY):
         rospy.sleep(0.5)
         subprocess.run([
             "rosrun", "gazebo_ros", "spawn_model",
-            "-file", "../viz/marker_model.sdf",
+            "-file", "/home/strecus/jackal_ws/src/viz/marker_model.sdf",
             "-sdf",
             "-model", "goal_marker",
             "-x", str(gX),
@@ -53,7 +53,7 @@ def calc_goal(path="z.json",intialTheta=0.0, intialX=0.0, intialY=0.0):
         print("No path to execute. Record a path first.")
         return None
 
-    gX, gY, gTheta =0, 0, intialTheta  # Global pose
+    gX, gY, gTheta =intialX, intialY, intialTheta  # Global pose
     
 
     pathArr = []
@@ -108,7 +108,7 @@ def set_goal(gX, gY, gTheta):
         client.wait_for_server()
 
         goal_goal = MoveBaseGoal()
-        goal_goal.target_pose.header.frame_id = "odom"
+        goal_goal.target_pose.header.frame_id = "map"
         goal_goal.target_pose.header.stamp = rospy.Time.now()
 
         goal_goal.target_pose.pose.position.x = gX

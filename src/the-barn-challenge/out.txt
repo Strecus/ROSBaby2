@@ -12,3 +12,15 @@
 0 False False True 100.0920
 0 False False True 100.0650
 0 False True False 60.3800
+0 False True False 47.4410
+0 False False True 100.0360
+0 False False True 100.0870
+0 True False False 64.1570
+0 False False True 100.0470
+0 False True False 4.3320
+0 False True False 8.6100
+0 False False True 100.0620
+0 False False True 100.0770
+0 False True False 0.0140
+0 False True False 0.0760
+0 False True False 11.7790

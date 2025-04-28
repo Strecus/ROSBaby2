@@ -7,7 +7,6 @@ planner_frequency: 20.0
 planner_patience: 5.0
 
 xy_goal_tolerance: 0.05  # default is 0.25
-
 oscillation_timeout: 0.0
 oscillation_distance: 0.5
 

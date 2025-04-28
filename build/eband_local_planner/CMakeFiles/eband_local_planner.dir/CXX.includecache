@@ -188,10 +188,6 @@ Eigen/Core
 Eigen/Geometry
 -
 
-/home/strecus/jackal_ws/src/eband_local_planner/src/conversions_and_types.cpp
-eband_local_planner/conversions_and_types.h
--
-
 /home/strecus/jackal_ws/src/eband_local_planner/src/eband_local_planner.cpp
 eband_local_planner/eband_local_planner.h
 -

@@ -1,0 +1,19 @@
+<launch>
+  <!-- Pass the map file path -->
+  <arg name="map_file" default="$(find jackal_navigation)/maps/my_saved_map.yaml" />
+  <arg name="scan_topic" default="front/scan" />
+
+  <!-- Start map_server to publish the map -->
+  <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)" />
+
+  <!-- Start AMCL -->
+  <node pkg="amcl" type="amcl" name="amcl">
+    <param name="use_map_topic" value="true"/>
+    <param name="odom_model_type" value="diff"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="base_frame_id" value="base_link"/>
+    <param name="global_frame_id" value="map"/>
+    <remap from="scan" to="$(arg scan_topic)"/>
+  </node>
+
+</launch>
