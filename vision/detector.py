@@ -37,6 +37,7 @@ scaler_path = 'training/models/scaler.pkl'
 
 def sendGoal(type, mother=False):
     if not mother:
+        pass
         #cv_commands_publisher.publish_goal(type)
     else:
         cv_commands_publisher.execute_path(type)
