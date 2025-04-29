@@ -36,11 +36,11 @@ def publish_goal(type="forward"):
 
     if type=="forward":
         gX += 2
-    else if type=="backward":
+    elif type=="backward":
         gX -= 2
-    else if type=="right":
+    elif type=="right":
         gY += 2
-    else if type=="left":
+    elif type=="left":
         gY -= 2
     goalSetter.set_goal(gX, gY, gTheta)
     #print("No errorsk")
