@@ -30,7 +30,8 @@ def sendGoal(gesture_type):
     if gesture_type.lower() == "no pose detected" or gesture_type.lower() == "unknown":
         return
     try:
-        choice = input("Do you want to control the robot directly instead of sending goals? (y/n): ").strip().lower()
+        #choice = input("Do you want to control the robot directly instead of sending goals? (y/n): ").strip().lower()
+        choice = 'n'
         if choice == 'y':
             cv_commands_publisher.execute_path(gesture_type)
         else:
