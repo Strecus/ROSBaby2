@@ -49,7 +49,7 @@ def main():
     print(f"Using model directory: {model_dir}")
     
     # Ask user for camera ID
-    camera_id = 0
+    camera_id = 1
     try:
         camera_input = input("\nEnter camera ID (default is 0, use 1 for external camera): ")
         if camera_input.strip():
