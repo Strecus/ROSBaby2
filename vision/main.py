@@ -8,6 +8,8 @@ import pickle
 from collections import deque
 import hand_gesture
 import body_pose
+
+import sys
 sys.path.append('/home/strecus/jackal_ws/src/the-barn-challenge/')
 import cv_commands_publisher
 
