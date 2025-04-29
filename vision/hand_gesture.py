@@ -32,6 +32,7 @@ def sendGoal(gesture_type):
     try:
         #choice = input("Do you want to control the robot directly instead of sending goals? (y/n): ").strip().lower()
         print(gesture_type)
+        cv_commands_publisher.publish_goal(gesture_type)
         """
         choice = 'n'
         if choice == 'y':
