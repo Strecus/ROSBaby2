@@ -1,0 +1,6 @@
+/venv/
+/models/
+/training/videos/
+/training/dataset/
+/training/__pycache__/
+/__pycache__/
