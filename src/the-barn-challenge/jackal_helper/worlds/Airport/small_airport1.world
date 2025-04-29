@@ -725,7 +725,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/airport+fuel+truck/model.dae</uri>
+              <uri>building_editor_models/airport+fuel+truck/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -748,7 +748,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/airport+fuel+truck/model.dae</uri>
+              <uri>building_editor_models/airport+fuel+truck/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -822,7 +822,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/Group_7/model.dae</uri>
+              <uri>building_editor_models/Group_7/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -843,7 +843,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/Group_7/model.dae</uri>
+              <uri>building_editor_models/Group_7/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -924,7 +924,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/aereo/model.dae</uri>
+              <uri>building_editor_models/aereo/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -947,7 +947,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/aereo/model.dae</uri>
+              <uri>building_editor_models/aereo/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1021,7 +1021,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/Group_7/model.dae</uri>
+              <uri>building_editor_models/Group_7/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1042,7 +1042,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/Group_7/model.dae</uri>
+              <uri>building_editor_models/Group_7/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1123,7 +1123,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/airport+fuel+truck/model.dae</uri>
+              <uri>building_editor_models/airport+fuel+truck/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1146,7 +1146,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/airport+fuel+truck/model.dae</uri>
+              <uri>building_editor_models/airport+fuel+truck/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1220,7 +1220,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1241,7 +1241,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1318,7 +1318,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1339,7 +1339,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1416,7 +1416,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1437,7 +1437,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1514,7 +1514,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1535,7 +1535,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1612,7 +1612,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1633,7 +1633,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/vboxuser/vboxuser/ROSBaby2-1/src/the-barn-challenge/jackal_helper/worlds/Airport/building_editor_models/luggage/model.dae</uri>
+              <uri>building_editor_models/luggage/model.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
