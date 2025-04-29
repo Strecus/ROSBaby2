@@ -288,7 +288,7 @@ def run_hand_gesture(camera_id=0):
             # Display the frame
             cv2.imshow('Gesture Recognition', frame)
 
-           
+            sendGoal(gesture_detected)
             # Break the loop when 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
