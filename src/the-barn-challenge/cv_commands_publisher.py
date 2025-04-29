@@ -19,11 +19,18 @@ def publish_goal(type="forward"):
     json_path= "/home/strecus/jackal_ws/src/the-barn-challenge/"
     path = json_path + type + ".json"
 
+    print("Location check")
     jackal_coords = jL.location()
-    
+    print("Location check ran with no errors")
+
+
+    print("Calc position for goal check")
     gX, gY, gTheta = goalSetter.calc_goal(path, jackal_coords[2], jackal_coords[0], jackal_coords[1])
     print("No errors!")
+
+    print("Set goal check")
     goalSetter.set_goal(gX, gY, gTheta)
+    print("No errorsk")
 
     
     goalSetter.spawn_marker(gX, gY)
