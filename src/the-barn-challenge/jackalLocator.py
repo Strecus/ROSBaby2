@@ -29,7 +29,7 @@ def location():
         orientation.z,
         orientation.w
     ])
-    print("Jackal's position is: (" + str(x)+"," + str(y)+"," + str(z)+")")
+    print("Jackal's position is: (" + str(x)+"," + str(y)+"," + str(yaw)+")")
     return x, y, yaw
 
 if __name__ == "__main__":
