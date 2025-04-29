@@ -1,0 +1,3 @@
+NEED TO WORK WITH 
+/Users/arman/Desktop/ROSBaby2/src/the-barn-challenge/cv_commands_publisher.py
+TO GET COMMANDS FROM VIZ TO ROS
