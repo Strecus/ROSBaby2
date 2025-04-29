@@ -5,6 +5,7 @@ import subprocess
 import actionlib
 from move_base_msgs.msg import MoveBaseAction
 import goalSetter
+import math
 
 
 import sys; sys.path.append('/home/strecus/jackal_ws/src/the-barn-challenge'); import jackalLocator as jL
@@ -32,16 +33,23 @@ def publish_goal(type="forward"):
     #print("No errors!")
 
     #print("Set goal check")
-    gX, gY, gTheta = jackal_coords[0], jackal_coords[1], jackal_coords[2]
-
-    if type=="forward":
-        gX += 2
-    elif type=="backward":
-        gX -= 2
-    elif type=="right":
-        gY += 2
-    elif type=="left":
-        gY -= 2
+   
+    dx = 0
+    dy = 0
+    
+    if type == "forward":
+        dx = 2
+    elif type == "backward":
+        dx = -2
+    elif type == "right":
+        dy = -2  # right is negative in robot's left-hand coordinate frame
+    elif type == "left":
+        dy = 2
+    
+    # Rotate relative motion into global coordinates
+    gX = jackal_coords[0] + dx * math.cos(gTheta) - dy * math.sin(gTheta)
+    gY = jackal_coords[1] + dx * math.sin(gTheta) + dy * math.cos(gTheta)
+    gTheta = jackal_coords[2]  # keep same orientation
     goalSetter.set_goal(gX, gY, gTheta)
     #print("No errorsk")
 
