@@ -4,6 +4,10 @@ import numpy as np
 import time
 import os
 import platform
+import sys
+sys.path.append('/home/strecus/jackal_ws/src/the-barn-challenge/')
+import cv_commands_publisher
+
 
 # Initialize MediaPipe Hands solution
 mp_hands = mp.solutions.hands
@@ -18,6 +22,21 @@ GESTURE_MAP = {
     "Pointing_Right": "right",
     "Pointing_Left": "left"
 }
+def sendGoal(gesture_type):
+    """
+    Call the goal publisher or execute path from cv_commands_publisher
+    with the given gesture type, based on user input.
+    """
+    if gesture_type.lower() == "no pose detected" or gesture_type.lower() == "unknown":
+        return
+    try:
+        choice = input("Do you want to control the robot directly instead of sending goals? (y/n): ").strip().lower()
+        if choice == 'y':
+            cv_commands_publisher.execute_path(gesture_type)
+        else:
+            cv_commands_publisher.publish_goal(gesture_type)
+    except Exception as e:
+        print(f"Error handling goal command: {e}")
 
 # Helper function to calculate distance between two points
 def calculate_distance(point1, point2):
@@ -268,7 +287,15 @@ def run_hand_gesture(camera_id=0):
             
             # Display the frame
             cv2.imshow('Gesture Recognition', frame)
-            
+
+            while True:
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord('n'):
+                    break
+                elif key == ord('q'):
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    return
             # Break the loop when 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
