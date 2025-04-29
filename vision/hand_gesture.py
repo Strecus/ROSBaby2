@@ -290,7 +290,7 @@ def run_hand_gesture(camera_id=0):
 
             while True:
                 key = cv2.waitKey(1) & 0xFF
-                if key == ord('n'):
+                if key != ord('n'):
                     cap.release()
                     cap = cv2.VideoCapture(0)
                     break
