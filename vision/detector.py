@@ -339,7 +339,7 @@ def run_pose_detection(camera_id):
 
             cv2.imshow('Pose Recognition', frame)
              
-            if pose_detected.lower() != "unknown" || pose_detected != "No pose detected":
+            if pose_detected.lower() != "unknown" or pose_detected != "No pose detected":
                 sendGoal(pose_detected)
                 while True:
                         if cv2.waitKey(1) & 0xFF == ord('n'):
