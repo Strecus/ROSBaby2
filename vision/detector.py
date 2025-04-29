@@ -248,7 +248,7 @@ def detect_stop(pose_landmarks, mp_pose):
 # MASTER pose detection function
 def detect_pose(pose_landmarks, mp_pose):
     if detect_turn_pose(pose_landmarks, mp_pose, side="left"):
-        return "tleft"
+        return "left"
     elif detect_turn_pose(pose_landmarks, mp_pose, side="right"):
         return "right"
     elif detect_forward_pose(pose_landmarks, mp_pose):
