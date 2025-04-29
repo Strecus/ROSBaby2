@@ -45,12 +45,15 @@ def publish_goal(type="forward"):
         dy = -2  # right is negative in robot's left-hand coordinate frame
     elif type == "left":
         dy = 2
-    
+
+
+    gTheta = jackal_coords[2]  # keep same orientation
+
     # Rotate relative motion into global coordinates
     gX = jackal_coords[0] + dx * math.cos(gTheta) - dy * math.sin(gTheta)
     gY = jackal_coords[1] + dx * math.sin(gTheta) + dy * math.cos(gTheta)
     gTheta = jackal_coords[2]  # keep same orientation
-    goalSetter.set_goal(gX, gY, gTheta)
+
     #print("No errorsk")
 
     
