@@ -6,6 +6,9 @@ import pickle
 import os
 from collections import deque
 
+import sys
+sys.path.append('/home/strecus/jackal_ws/src/the-barn-challenge/')
+import cv_commands_publisher
 # Initialize MediaPipe Pose
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -32,7 +35,12 @@ scaler_path = 'training/models/scaler.pkl'
 
 
 
-
+def sendGoal(type, mother=False):
+    if !mother:
+        cv_commands_publisher.publish_goal(type)
+    else:
+        cv_commands_publisher.execute_path(type)
+        
 #TESTING ANGLES START 
 
 # Utility to calculate angle at point b
@@ -239,9 +247,9 @@ def detect_stop(pose_landmarks, mp_pose):
 # MASTER pose detection function
 def detect_pose(pose_landmarks, mp_pose):
     if detect_turn_pose(pose_landmarks, mp_pose, side="left"):
-        return "turn_left"
+        return "tleft"
     elif detect_turn_pose(pose_landmarks, mp_pose, side="right"):
-        return "turn_right"
+        return "right"
     elif detect_forward_pose(pose_landmarks, mp_pose):
         return "forward"
     elif detect_stop(pose_landmarks, mp_pose):
@@ -342,7 +350,14 @@ with mp_pose.Pose(
 
 
 
-        
+        if pose_detected.lower() != "unknown":
+            sendGoal(pose_detected)
+            while True:
+                    if cv2.waitKey(1) & 0xFF == ord('n'):
+                        cap.release()
+                        cap = cv2.VideoCapture(0)
+                        break
+                        
         # Display the pose name on the frame
         cv2.putText(frame, f"Pose: {pose_detected}", (10, 30), 
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
