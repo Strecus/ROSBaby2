@@ -296,7 +296,7 @@ def main():
             print("- Turn Right: Right arm bent, left arm straight")
             print("- Stop: Arms straight up")
             print("\nPress 'q' to quit the application")
-            detector.run_angle_based_pose(camera_id)
+            detector.run_pose_detection(camera_id)
             valid_choice = True
             
         else:
