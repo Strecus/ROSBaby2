@@ -1,44 +1,43 @@
+#!/usr/bin/env python3
+
 import rospy
-from geometry_msgs.msg import PoseWithCovarianceStamped
+from gazebo_msgs.msg import ModelStates
+import tf
+import math
 
-# Global variable to store the position
-jackal_coords = None
+def location():
+    """Get the true x, y, yaw (radians) of the Jackal from Gazebo."""
+    # Wait until model states is available
+    data = rospy.wait_for_message('/gazebo/model_states', ModelStates)
+    
+    try:
+        idx = data.name.index('jackal')
+    except ValueError:
+        rospy.logerr("Jackal not found in /gazebo/model_states!")
+        return None, None, None
 
-def pose_callback(msg):
-    global jackal_coords
-    x = msg.pose.pose.position.x
-    y = msg.pose.pose.position.y
-    theta = msg.pose.pose.orientation.z  # Assuming a simple 2D setup
-    jackal_coords = (x, y, theta)
+    pose = data.pose[idx]
+    x = pose.position.x
+    y = pose.position.y
 
-def get_jackal_position_using_amcl():
-    """
-    Get the current position of the Jackal robot using AMCL's /amcl_pose topic.
-    Returns a tuple (x, y, theta) for the robot's position and orientation.
-    """
-    global jackal_coords
+    # Convert quaternion to yaw
+    orientation = pose.orientation
+    (_, _, yaw) = tf.transformations.euler_from_quaternion([
+        orientation.x,
+        orientation.y,
+        orientation.z,
+        orientation.w
+    ])
 
-    #rospy.init_node('get_jackal_position_using_amcl', anonymous=True)
+    return x, y, yaw
 
-    # Subscribe to the /amcl_pose topic
-    rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, pose_callback)
-
-    # Wait until we get the first valid position
-    while jackal_coords is None:
-        rospy.sleep(0.1)  # Wait for the message to arrive
-
-    # Optionally, log the position once it's retrieved
-    rospy.loginfo(f"Jackal position: {jackal_coords}")
-
-    # Shutdown the node after getting the position
-    #rospy.signal_shutdown("Position retrieved")
-
-    return jackal_coords
-
-# Example usage in the main function
 if __name__ == "__main__":
-    # Calling the method to get Jackal's position
-    position = get_jackal_position_using_amcl()
-    if position:
-        x, y, theta = position
-        rospy.loginfo(f"Current Position: x={x}, y={y}, theta={theta}")
+    rospy.init_node('jackal_ground_truth_reader', anonymous=True)
+
+    x, y, yaw = get_true_jackal_pose()
+
+    if x is not None:
+        print(f"Jackal True Position:")
+        print(f"  X: {x:.3f} meters")
+        print(f"  Y: {y:.3f} meters")
+        print(f"  Yaw: {yaw:.3f} radians")

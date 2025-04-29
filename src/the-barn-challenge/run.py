@@ -62,7 +62,7 @@ if __name__ == "__main__":
     if args.world_idx < 299:
         world_name = "BARN/world_%d.world" % (args.world_idx)
     else:
-        world_name = "Airport/basic_airport%d.world" % (args.world_idx%299)
+        world_name = "Airport/small_airport%d.world" % (args.world_idx%299)
     
     print(f">>>>>>>>>>>>>>>> Loading Gazebo Simulation with {world_name} <<<<<<<<<<<<<<<<")
     rospack = rospkg.RosPack()
@@ -82,16 +82,15 @@ if __name__ == "__main__":
     
 
 
-    subprocess.Popen(["gnome-terminal", "--", "roslaunch", "jackal_navigation", "amcl.launch"])
+    #subprocess.Popen(["gnome-terminal", "--", "roslaunch", "jackal_navigation", "amcl.launch"])
 
-    map_file = f"/home/strecus/jackal_ws/src/jackal_navigation/maps/Airport/basic_airport{args.world_idx % 299}.yaml"
-    """
+    map_file = f"/home/strecus/jackal_ws/src/jackal/jackal_navigation/maps/world_{args.world_idx % 299}.yaml"
     subprocess.Popen([
     "gnome-terminal", "--",
     "roslaunch", "jackal_navigation", "amcl.launch",
     f"map_file:={map_file}"
     ])
-    """
+    
 
     time.sleep(2)
 

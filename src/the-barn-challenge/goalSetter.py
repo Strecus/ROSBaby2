@@ -89,7 +89,7 @@ def calc_goal(path="z.json",intialTheta=0.0, intialX=0.0, intialY=0.0):
         print(f"Error during goal calulation with path: {e}")
         return None
 
-def set_goal(gX, gY, gTheta):
+def set_goal(gX, gY, gTheta, stop=False):
    
 
 
@@ -118,6 +118,9 @@ def set_goal(gX, gY, gTheta):
 
         rospy.loginfo(f"Sending goal to ({gX:.2f}, {gY:.2f}, θ={gTheta:.2f} rad)")
 
+        if stop:
+            return
+        
         client.send_goal(goal_goal)
         
 

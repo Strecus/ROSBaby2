@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import subprocess
 import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy
@@ -273,6 +274,10 @@ def visualize_path():
     print("---------------------------")
 
 def main():
+    subprocess.Popen([
+    "gnome-terminal", "--",
+    "bash", "-c", "rosrun joy joy_node; exec bash"
+    ])
     global path
     print("Control Your Robot using Controller!")
     print("Recording your path based on joystick input.")
