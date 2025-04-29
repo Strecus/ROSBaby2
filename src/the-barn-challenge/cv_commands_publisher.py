@@ -25,7 +25,8 @@ def publish_goal(type="forward"):
 
 
     print("Calc position for goal check")
-    gX, gY, gTheta = goalSetter.calc_goal(path, jackal_coords[2], jackal_coords[0], jackal_coords[1])
+    print(jackal_coords)
+    gX, gY, gTheta = goalSetter.calc_goal(path, jackal_coords[0], jackal_coords[1], jackal_coords[2])
     print("No errors!")
 
     print("Set goal check")
