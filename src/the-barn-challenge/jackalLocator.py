@@ -7,6 +7,7 @@ import math
 
 def location():
     """Get the true x, y, yaw (radians) of the Jackal from Gazebo."""
+    print("hey")
     # Wait until model states is available
     data = rospy.wait_for_message('/gazebo/model_states', ModelStates)
     
@@ -28,7 +29,7 @@ def location():
         orientation.z,
         orientation.w
     ])
-
+    print("hey")
     return x, y, yaw
 
 if __name__ == "__main__":
