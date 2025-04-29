@@ -32,7 +32,7 @@ def publish_goal(type="forward"):
     #print("No errors!")
 
     #print("Set goal check")
-    gx, gy, gTheta = jackal_coords[0], jackal_coords[1], jackal_coords[2]
+    gX, gY, gTheta = jackal_coords[0], jackal_coords[1], jackal_coords[2]
 
     if type=="forward":
         gX += 2
