@@ -16,6 +16,8 @@ def wait_for_goal_to_finish():
     client.wait_for_result()
 
 def publish_goal(type="forward"):
+    if not rospy.core.is_initialized():
+        rospy.init_node('publish_goal_node', anonymous=True)
     json_path= "/home/strecus/jackal_ws/src/the-barn-challenge/"
     path = json_path + type + ".json"
 
