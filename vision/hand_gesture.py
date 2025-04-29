@@ -31,11 +31,14 @@ def sendGoal(gesture_type):
         return
     try:
         #choice = input("Do you want to control the robot directly instead of sending goals? (y/n): ").strip().lower()
+        print(gesture_type)
+        """
         choice = 'n'
         if choice == 'y':
             cv_commands_publisher.execute_path(gesture_type)
         else:
             cv_commands_publisher.publish_goal(gesture_type)
+        """
     except Exception as e:
         print(f"Error handling goal command: {e}")
 
@@ -291,6 +294,12 @@ def run_hand_gesture(camera_id=0):
 
             if gesture_detected in GESTURE_MAP.values():
                 sendGoal(gesture_detected)
+                while True:
+                    if cv2.waitKey(1) & 0xFF == ord('n'):
+                        cap.VideoCapture(camera_id)
+                        break
+                        
+            
             # Break the loop when 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
