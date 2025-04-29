@@ -78,9 +78,11 @@ def main():
             print("\nPress 'q' to quit the application")
             hand_gesture.run_hand_gesture(camera_id)
             valid_choice = True
-            
+           
         elif choice == "2":
             # Sub-menu for body pose detection
+            print("Under maintinenece")
+            """
             body_pose_choice = ""
             while body_pose_choice not in ["1", "2"]:
                 print("\nBody Pose Recognition Options:")
@@ -100,7 +102,7 @@ def main():
             print("\nPress 'q' to quit the application")
             body_pose.run_body_pose(camera_id, force_basic_detection)
             valid_choice = True
-            
+         """   
         elif choice == "3":
             print("\nStarting Angle-based Body Pose Recognition...")
             print("Available poses:")
