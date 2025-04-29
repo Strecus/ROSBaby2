@@ -30,21 +30,6 @@ LANDMARKS_OF_INTEREST = [
     mp_pose.PoseLandmark.RIGHT_SHOULDER
 ]
 
-def sendGoal(gesture_type):
-    """
-    Call the goal publisher or execute path from cv_commands_publisher
-    with the given gesture type, based on user input.
-    """
-    if gesture_type.lower() == "no pose detected" or gesture_type.lower() == "unknown":
-        return
-    try:
-        choice = input("Do you want to control the robot directly instead of sending goals? (y/n): ").strip().lower()
-        if choice == 'y':
-            cv_commands_publisher.execute_path(gesture_type)
-        else:
-            cv_commands_publisher.publish_goal(gesture_type)
-    except Exception as e:
-        print(f"Error handling goal command: {e}")
 
 # Utility to calculate angle at point b
 def calculate_angle(a, b, c):
