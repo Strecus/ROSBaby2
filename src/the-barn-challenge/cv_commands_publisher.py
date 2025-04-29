@@ -22,6 +22,7 @@ def publish_goal(type="forward"):
     jackal_coords = jL.location()
     
     gX, gY, gTheta = goalSetter.calc_goal(path, jackal_coords[2], jackal_coords[0], jackal_coords[1])
+    print("No errors!")
     goalSetter.set_goal(gX, gY, gTheta)
 
     
