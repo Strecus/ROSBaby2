@@ -340,7 +340,7 @@ def run_pose_detection(camera_id):
             cv2.imshow('Pose Recognition', frame)
 
             
-            if pose_detected.lower() != "unknown" or pose_detected.strip() != "No pose detected":
+            if pose_detected.lower() != "unknown" and pose_detected.strip() != "No pose detected":
                 sendGoal(pose_detected)
                 print(pose_detected)
                 print("heheh")
