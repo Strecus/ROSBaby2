@@ -280,100 +280,74 @@ POSE_HISTORY = deque(maxlen=10) #Buffer of last 10 poses
 
 
 
-# Start webcam
-cap = cv2.VideoCapture(1)  # Use 0 for default camera, or try 1 if that doesn't work
-
-# Check if camera opened successfully
-if not cap.isOpened():
-    print("Error: Could not open camera.")
-    exit()
-
-# Configure MediaPipe Pose
-with mp_pose.Pose(
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5) as pose:
-    
-    while True:
-        # Capture frame-by-frame
-        ret, frame = cap.read()
-        
-        if not ret or frame is None:
-            print("Error: Failed to capture image")
-            break
-        
-        # Flip the image horizontally for a selfie-view display
-        frame = cv2.flip(frame, 1)
-        
-        # Convert the BGR image to RGB
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        # To improve performance, optionally mark the image as not writeable
-        rgb_frame.flags.writeable = False
-        
-        # Process the image and detect poses
-        results = pose.process(rgb_frame)
-        
-        # Draw the pose annotations on the image
-        rgb_frame.flags.writeable = True
-        frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
-        
-        # Extract pose and display on frame
-        pose_detected = "No pose detected"
-        confidence = 0.0
-        
-        if results.pose_landmarks:
-            # Draw skeleton
-            mp_drawing.draw_landmarks(
-                frame,
-                results.pose_landmarks,
-                mp_pose.POSE_CONNECTIONS,
-                landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-            
-            #DEBUGGING HELPER
-            draw_pose_debug(frame, results.pose_landmarks.landmark)
-            
-            #USE BASIC DETECTION CAN REMOVE
-            model_loaded = False;
-            
-            # Detect the pose
-            # Use basic detection as fallback
-            curr_pose = detect_pose(results.pose_landmarks.landmark, mp_pose)  #EDITED FUNCTION CALL
-
-            POSE_HISTORY.append(curr_pose)
-
-            if POSE_HISTORY:
-                pose_detected = max(set(POSE_HISTORY), key=POSE_HISTORY.count)
-            else:
-                pose_detected = "unknown"
 
 
+def run_pose_detection(camera_id):
+    # Start webcam
+    cap = cv2.VideoCapture(camera_id)  # Use 0 for default camera, or 0 if that's your webcam
 
+    # Check if camera opened successfully
+    if not cap.isOpened():
+        print("Error: Could not open camera.")
+        return
 
+    # Configure MediaPipe Pose
+    with mp_pose.Pose(
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5) as pose:
 
-        if pose_detected.lower() != "unknown":
-            sendGoal(pose_detected)
-            while True:
-                    if cv2.waitKey(1) & 0xFF == ord('n'):
-                        cap.release()
-                        cap = cv2.VideoCapture(0)
-                        break
-                        
-        # Display the pose name on the frame
-        cv2.putText(frame, f"Pose: {pose_detected}", (10, 30), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        
-        # Display confidence if available
-        if confidence > 0:
-            cv2.putText(frame, f"Confidence: {confidence:.1f}%", (10, 70), 
+        while True:
+            ret, frame = cap.read()
+            if not ret or frame is None:
+                print("Error: Failed to capture image")
+                break
+
+            frame = cv2.flip(frame, 1)
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            rgb_frame.flags.writeable = False
+            results = pose.process(rgb_frame)
+            rgb_frame.flags.writeable = True
+            frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
+
+            pose_detected = "No pose detected"
+            confidence = 0.0
+
+            if results.pose_landmarks:
+                mp_drawing.draw_landmarks(
+                    frame,
+                    results.pose_landmarks,
+                    mp_pose.POSE_CONNECTIONS,
+                    landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+
+                draw_pose_debug(frame, results.pose_landmarks.landmark)
+
+                curr_pose = detect_pose(results.pose_landmarks.landmark, mp_pose)
+                POSE_HISTORY.append(curr_pose)
+
+                if POSE_HISTORY:
+                    pose_detected = max(set(POSE_HISTORY), key=POSE_HISTORY.count)
+                else:
+                    pose_detected = "unknown"
+
+            cv2.putText(frame, f"Pose: {pose_detected}", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        
-        # Display the frame
-        cv2.imshow('Pose Recognition', frame)
-        
-        # Break the loop when 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
 
-# Release the camera and close windows
-cap.release()
-cv2.destroyAllWindows()
+            if confidence > 0:
+                cv2.putText(frame, f"Confidence: {confidence:.1f}%", (10, 70),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+            cv2.imshow('Pose Recognition', frame)
+             
+            if pose_detected.lower() != "unknown":
+                sendGoal(pose_detected)
+                while True:
+                        if cv2.waitKey(1) & 0xFF == ord('n'):
+                            cap.release()
+                            cap = cv2.VideoCapture(0)
+                            break
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    cap.release()
+    cv2.destroyAllWindows()
