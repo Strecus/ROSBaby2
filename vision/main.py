@@ -8,6 +8,7 @@ import pickle
 from collections import deque
 import hand_gesture
 import body_pose
+import cv_commands_publisher
 
 # Initialize MediaPipe Pose
 mp_drawing = mp.solutions.drawing_utils
@@ -29,218 +30,109 @@ LANDMARKS_OF_INTEREST = [
     mp_pose.PoseLandmark.RIGHT_SHOULDER
 ]
 
+def sendGoal(gesture_type):
+    """
+    Call the goal publisher or execute path from cv_commands_publisher
+    with the given gesture type, based on user input.
+    """
+    if gesture_type.lower() == "no pose detected" or gesture_type.lower() == "unknown":
+        return
+    try:
+        choice = input("Do you want to control the robot directly instead of sending goals? (y/n): ").strip().lower()
+        if choice == 'y':
+            cv_commands_publisher.execute_path(gesture_type)
+        else:
+            cv_commands_publisher.publish_goal(gesture_type)
+    except Exception as e:
+        print(f"Error handling goal command: {e}")
+
 # Utility to calculate angle at point b
 def calculate_angle(a, b, c):
     a = np.array(a)
     b = np.array(b)
     c = np.array(c)
-
     ba = a - b
     bc = c - b
-
     cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
     angle = np.arccos(np.clip(cosine_angle, -1.0, 1.0))
-
     return np.degrees(angle)
-
 
 # Detect TURN LEFT or TURN RIGHT
 def detect_turn_pose(pose_landmarks, mp_pose, side="left"):
     if side == "left":
-        # Turn left => Right arm is static, left arm is moving
         static_shoulder = mp_pose.PoseLandmark.RIGHT_SHOULDER
         static_elbow = mp_pose.PoseLandmark.RIGHT_ELBOW
         static_wrist = mp_pose.PoseLandmark.RIGHT_WRIST
-
         moving_shoulder = mp_pose.PoseLandmark.LEFT_SHOULDER
         moving_elbow = mp_pose.PoseLandmark.LEFT_ELBOW
         moving_wrist = mp_pose.PoseLandmark.LEFT_WRIST
-    elif side == "right":
-        # Turn right => Left arm is static, right arm is moving
+    else:
         static_shoulder = mp_pose.PoseLandmark.LEFT_SHOULDER
         static_elbow = mp_pose.PoseLandmark.LEFT_ELBOW
         static_wrist = mp_pose.PoseLandmark.LEFT_WRIST
-
         moving_shoulder = mp_pose.PoseLandmark.RIGHT_SHOULDER
         moving_elbow = mp_pose.PoseLandmark.RIGHT_ELBOW
         moving_wrist = mp_pose.PoseLandmark.RIGHT_WRIST
-    else:
-        raise ValueError("side must be 'left' or 'right'")
-
-    # Get coordinates
+    # Coordinates
     static_shoulder_coord = [pose_landmarks[static_shoulder].x, pose_landmarks[static_shoulder].y]
     static_elbow_coord = [pose_landmarks[static_elbow].x, pose_landmarks[static_elbow].y]
     static_wrist_coord = [pose_landmarks[static_wrist].x, pose_landmarks[static_wrist].y]
-
     moving_shoulder_coord = [pose_landmarks[moving_shoulder].x, pose_landmarks[moving_shoulder].y]
     moving_elbow_coord = [pose_landmarks[moving_elbow].x, pose_landmarks[moving_elbow].y]
     moving_wrist_coord = [pose_landmarks[moving_wrist].x, pose_landmarks[moving_wrist].y]
-
     hip = mp_pose.PoseLandmark.LEFT_HIP if side == "left" else mp_pose.PoseLandmark.RIGHT_HIP
     hip_coord = [pose_landmarks[hip].x, pose_landmarks[hip].y]
-
-    # Calculate angles
-    static_shoulder_angle = calculate_angle(
-        hip_coord,
-        static_shoulder_coord,
-        static_wrist_coord
-    )
+    # Angles
+    static_shoulder_angle = calculate_angle(hip_coord, static_shoulder_coord, static_wrist_coord)
     static_elbow_angle = calculate_angle(static_shoulder_coord, static_elbow_coord, static_wrist_coord)
-
-    moving_shoulder_angle = calculate_angle(
-        hip_coord,
-        moving_shoulder_coord,
-        moving_wrist_coord
-    )
+    moving_shoulder_angle = calculate_angle(hip_coord, moving_shoulder_coord, moving_wrist_coord)
     moving_elbow_angle = calculate_angle(moving_shoulder_coord, moving_elbow_coord, moving_wrist_coord)
-
     # Thresholds
-    SHOULDER_ANGLE_MIN = 60
-    SHOULDER_ANGLE_MAX = 200  #120
-    STATIC_ELBOW_STRAIGHT_MIN = 160
-    STATIC_ELBOW_STRAIGHT_MAX = 190
-    MOVING_ELBOW_BENT_MIN = 30
-    MOVING_ELBOW_BENT_MAX = 150  # Allow more range since it's dynamic
-
-    static_arm_ok = (SHOULDER_ANGLE_MIN <= static_shoulder_angle <= SHOULDER_ANGLE_MAX and
-                     STATIC_ELBOW_STRAIGHT_MIN <= static_elbow_angle <= STATIC_ELBOW_STRAIGHT_MAX)
-
-    moving_arm_ok = (SHOULDER_ANGLE_MIN <= moving_shoulder_angle <= SHOULDER_ANGLE_MAX and
-                     MOVING_ELBOW_BENT_MIN <= moving_elbow_angle <= MOVING_ELBOW_BENT_MAX)
-    
-    elbow_angle_difference = abs(static_elbow_angle - moving_elbow_angle)
-    arms_are_asymmetric = elbow_angle_difference >= 50  # degrees
-
-    if static_arm_ok and moving_arm_ok and arms_are_asymmetric:
+    SHOULDER_MIN, SHOULDER_MAX = 60, 200
+    STATIC_ELBOW_MIN, STATIC_ELBOW_MAX = 160, 190
+    MOVING_ELBOW_MIN, MOVING_ELBOW_MAX = 30, 150
+    static_ok = (SHOULDER_MIN <= static_shoulder_angle <= SHOULDER_MAX and
+                 STATIC_ELBOW_MIN <= static_elbow_angle <= STATIC_ELBOW_MAX)
+    moving_ok = (SHOULDER_MIN <= moving_shoulder_angle <= SHOULDER_MAX and
+                 MOVING_ELBOW_MIN <= moving_elbow_angle <= MOVING_ELBOW_MAX)
+    if static_ok and moving_ok and abs(static_elbow_angle - moving_elbow_angle) >= 50:
         return True
-
     return False
-
 
 # Detect FORWARD pose
 def detect_forward_pose(pose_landmarks, mp_pose):
-    left_shoulder = [pose_landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].x,
-                     pose_landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].y]
-    left_elbow = [pose_landmarks[mp_pose.PoseLandmark.LEFT_ELBOW].x,
-                  pose_landmarks[mp_pose.PoseLandmark.LEFT_ELBOW].y]
-    left_wrist = [pose_landmarks[mp_pose.PoseLandmark.LEFT_WRIST].x,
-                  pose_landmarks[mp_pose.PoseLandmark.LEFT_WRIST].y]
-
-    right_shoulder = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER].x,
-                      pose_landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER].y]
-    right_elbow = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW].x,
-                   pose_landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW].y]
-    right_wrist = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_WRIST].x,
-                   pose_landmarks[mp_pose.PoseLandmark.RIGHT_WRIST].y]
-
+    # Shoulders, elbows, wrists coords
+    ls = [pose_landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].x,
+          pose_landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].y]
+    le = [pose_landmarks[mp_pose.PoseLandmark.LEFT_ELBOW].x,
+          pose_landmarks[mp_pose.PoseLandmark.LEFT_ELBOW].y]
+    lw = [pose_landmarks[mp_pose.PoseLandmark.LEFT_WRIST].x,
+          pose_landmarks[mp_pose.PoseLandmark.LEFT_WRIST].y]
+    rs = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER].x,
+          pose_landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER].y]
+    re = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW].x,
+          pose_landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW].y]
+    rw = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_WRIST].x,
+          pose_landmarks[mp_pose.PoseLandmark.RIGHT_WRIST].y]
+    # Angles
     left_shoulder_angle = calculate_angle(
         [pose_landmarks[mp_pose.PoseLandmark.LEFT_HIP].x, pose_landmarks[mp_pose.PoseLandmark.LEFT_HIP].y],
-        left_shoulder,
-        left_wrist
-    )
+        ls, lw)
     right_shoulder_angle = calculate_angle(
         [pose_landmarks[mp_pose.PoseLandmark.RIGHT_HIP].x, pose_landmarks[mp_pose.PoseLandmark.RIGHT_HIP].y],
-        right_shoulder,
-        right_wrist
-    )
-    left_elbow_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
-    right_elbow_angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
-
-    # Tight (perfect) thresholds
-    SHOULDER_ANGLE_MIN_TIGHT = 80
-    SHOULDER_ANGLE_MAX_TIGHT = 100
-    ELBOW_BENT_MIN_TIGHT = 60
-    ELBOW_BENT_MAX_TIGHT = 100
-    ELBOW_STRAIGHT_MIN_TIGHT = 160
-    ELBOW_STRAIGHT_MAX_TIGHT = 180
-
-    # Loose (in-motion) thresholds
-    SHOULDER_ANGLE_MIN_LOOSE = 50    #60
-    SHOULDER_ANGLE_MAX_LOOSE = 150   #140
-    ELBOW_MIN_LOOSE = 50
-    ELBOW_MAX_LOOSE = 190
-
-    # Perfect Cross Pose (straight or bent)
-    bent_arms_forward_tight = (SHOULDER_ANGLE_MIN_TIGHT <= left_shoulder_angle <= SHOULDER_ANGLE_MAX_TIGHT and
-                               SHOULDER_ANGLE_MIN_TIGHT <= right_shoulder_angle <= SHOULDER_ANGLE_MAX_TIGHT and
-                               ELBOW_BENT_MIN_TIGHT <= left_elbow_angle <= ELBOW_BENT_MAX_TIGHT and
-                               ELBOW_BENT_MIN_TIGHT <= right_elbow_angle <= ELBOW_BENT_MAX_TIGHT)
-
-    straight_arms_forward_tight = (SHOULDER_ANGLE_MIN_TIGHT <= left_shoulder_angle <= SHOULDER_ANGLE_MAX_TIGHT and
-                                   SHOULDER_ANGLE_MIN_TIGHT <= right_shoulder_angle <= SHOULDER_ANGLE_MAX_TIGHT and
-                                   ELBOW_STRAIGHT_MIN_TIGHT <= left_elbow_angle <= ELBOW_STRAIGHT_MAX_TIGHT and
-                                   ELBOW_STRAIGHT_MIN_TIGHT <= right_elbow_angle <= ELBOW_STRAIGHT_MAX_TIGHT)
-
-    # Loose motion detection (movement into forward)
-    loose_forward_motion = (SHOULDER_ANGLE_MIN_LOOSE <= left_shoulder_angle <= SHOULDER_ANGLE_MAX_LOOSE and
-                             SHOULDER_ANGLE_MIN_LOOSE <= right_shoulder_angle <= SHOULDER_ANGLE_MAX_LOOSE and
-                             ELBOW_MIN_LOOSE <= left_elbow_angle <= ELBOW_MAX_LOOSE and
-                             ELBOW_MIN_LOOSE <= right_elbow_angle <= ELBOW_MAX_LOOSE)
-    
-    elbow_angle_difference = abs(left_elbow_angle - right_elbow_angle)
-    arms_are_symmetric = elbow_angle_difference <= 30  # degrees
-
-    if (bent_arms_forward_tight or straight_arms_forward_tight or loose_forward_motion) and arms_are_symmetric:
+        rs, rw)
+    left_elbow_angle = calculate_angle(ls, le, lw)
+    right_elbow_angle = calculate_angle(rs, re, rw)
+    # Tight thresholds
+    if (80 <= left_shoulder_angle <= 100 and 80 <= right_shoulder_angle <= 100 and
+        60 <= left_elbow_angle <= 100 and 60 <= right_elbow_angle <= 100):
         return True
-
-    return False
-
-#Detect STOP pose (arms straight up)
-def detect_stop(pose_landmarks, mp_pose):
-    left_shoulder = [pose_landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].x,
-                     pose_landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].y]
-    left_elbow = [pose_landmarks[mp_pose.PoseLandmark.LEFT_ELBOW].x,
-                  pose_landmarks[mp_pose.PoseLandmark.LEFT_ELBOW].y]
-    left_wrist = [pose_landmarks[mp_pose.PoseLandmark.LEFT_WRIST].x,
-                  pose_landmarks[mp_pose.PoseLandmark.LEFT_WRIST].y]
-
-    right_shoulder = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER].x,
-                      pose_landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER].y]
-    right_elbow = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW].x,
-                   pose_landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW].y]
-    right_wrist = [pose_landmarks[mp_pose.PoseLandmark.RIGHT_WRIST].x,
-                   pose_landmarks[mp_pose.PoseLandmark.RIGHT_WRIST].y]
-    
-    left_shoulder_angle = calculate_angle(
-        [pose_landmarks[mp_pose.PoseLandmark.LEFT_HIP].x, pose_landmarks[mp_pose.PoseLandmark.LEFT_HIP].y],
-        left_shoulder,
-        left_wrist
-    )
-    right_shoulder_angle = calculate_angle(
-        [pose_landmarks[mp_pose.PoseLandmark.RIGHT_HIP].x, pose_landmarks[mp_pose.PoseLandmark.RIGHT_HIP].y],
-        right_shoulder,
-        right_wrist
-    )
-    left_elbow_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
-    right_elbow_angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
-
-    SHOULDER_ANGLE_MIN = 160    #60
-    SHOULDER_ANGLE_MAX = 180   #140
-    ELBOW_MIN = 160
-    ELBOW_MAX = 180
-
-    arms_straight_up = (SHOULDER_ANGLE_MIN <= left_shoulder_angle <= SHOULDER_ANGLE_MAX and
-                             SHOULDER_ANGLE_MIN <= right_shoulder_angle <= SHOULDER_ANGLE_MAX and
-                             ELBOW_MIN <= left_elbow_angle <= ELBOW_MAX and
-                             ELBOW_MIN <= right_elbow_angle <= ELBOW_MAX)
-    if arms_straight_up:
+    # Loose thresholds
+    if (50 <= left_shoulder_angle <= 150 and 50 <= right_shoulder_angle <= 150 and
+        50 <= left_elbow_angle <= 190 and 50 <= right_elbow_angle <= 190 and
+        abs(left_elbow_angle - right_elbow_angle) <= 30):
         return True
-
     return False
-
-# MASTER pose detection function
-def detect_pose(pose_landmarks, mp_pose):
-    if detect_turn_pose(pose_landmarks, mp_pose, side="left"):
-        return "turn_left"
-    elif detect_turn_pose(pose_landmarks, mp_pose, side="right"):
-        return "turn_right"
-    elif detect_forward_pose(pose_landmarks, mp_pose):
-        return "forward"
-    elif detect_stop(pose_landmarks, mp_pose):
-        return "stop"
-    else:
-        return "unknown"
-
 #HELPER FOR DEBUGGING
 def draw_pose_debug(frame, landmarks, visibility_threshold=0.5):
     def draw_point(name, color=GREEN, radius=5):
