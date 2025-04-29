@@ -6,12 +6,10 @@ import numpy as np
 import time
 import pickle
 from collections import deque
+
 import hand_gesture
 import body_pose
-
-import sys
-sys.path.append('/home/strecus/jackal_ws/src/the-barn-challenge/')
-import cv_commands_publisher
+import detector
 
 # Initialize MediaPipe Pose
 mp_drawing = mp.solutions.drawing_utils
@@ -229,10 +227,7 @@ def main():
     
     # Set paths based on operating system
     system = platform.system()
-    if system == 'Darwin':  # macOS
-        model_dir = 'models'
-    else:  # Windows or other OS
-        model_dir = 'models'
+    model_dir = 'models'
 
     # Create models directory if it doesn't exist
     os.makedirs(model_dir, exist_ok=True)
@@ -301,7 +296,7 @@ def main():
             print("- Turn Right: Right arm bent, left arm straight")
             print("- Stop: Arms straight up")
             print("\nPress 'q' to quit the application")
-            run_angle_based_pose(camera_id)
+            detector.run_angle_based_pose(camera_id)
             valid_choice = True
             
         else:
