@@ -296,7 +296,7 @@ def run_hand_gesture(camera_id=0):
                 sendGoal(gesture_detected)
                 while True:
                     if cv2.waitKey(1) & 0xFF == ord('n'):
-                        cap.VideoCapture(camera_id)
+                        cap = cv2.VideoCapture(camera_id)
                         break
                         
             
