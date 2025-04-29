@@ -8,6 +8,7 @@ import pickle
 from collections import deque
 import hand_gesture
 import body_pose
+sys.path.append('/home/strecus/jackal_ws/src/the-barn-challenge/')
 import cv_commands_publisher
 
 # Initialize MediaPipe Pose
@@ -198,7 +199,7 @@ def run_angle_based_pose(camera_id=0):
                     pose_detected = max(set(POSE_HISTORY), key=POSE_HISTORY.count)
                 else:
                     pose_detected = "unknown"
-            
+         
             # Display the pose name on the frame
             cv2.putText(frame, f"Pose: {pose_detected}", (10, 30), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
