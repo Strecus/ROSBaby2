@@ -344,7 +344,7 @@ def run_pose_detection(camera_id):
                 while True:
                         if cv2.waitKey(1) & 0xFF == ord('n'):
                             cap.release()
-                            cap = cv2.VideoCapture(0)
+                            cap = cv2.VideoCapture(camera_id)
                             break
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
